@@ -147,10 +147,10 @@ class assign_submission_onenote extends assign_submission_plugin {
         
         if (microsoft_onenote::get_onenote_token()) {                    
             // show a button to open the OneNote page
-            $o .= microsoft_onenote:: render_action_button('Work on the assignment in OneNote', 
+            $o .= microsoft_onenote:: render_action_button('Work on this in OneNote', 
                     $this->assignment->get_course_module()->id, false, $is_teacher, 
                     $submission ? $submission->userid : null, $submission ? $submission->id : null, null);
-            $o .= '<br/><p>Click on the button above to work on the assignment in OneNote. You can come back here later on to save your work back into Moodle.</p>';
+            $o .= '<br/><p>Click on the button above to work on the assignment in OneNote. Remember that you will need to come back here to save your work back into Moodle.</p>';
         } else {
             $o .= microsoft_onenote::get_onenote_signin_widget();
             $o .= '<br/><br/><p>Click on the button above to sign in to OneNote so you can work on the assignment there.</p>';
@@ -202,8 +202,14 @@ class assign_submission_onenote extends assign_submission_plugin {
         $onenote_api = microsoft_onenote::get_onenote_api();
         $download_info = $onenote_api->download_page($record->submission_student_page_id, $temp_file);
         
-        if (!$download_info)
+        if (!$download_info) {
+            if (microsoft_onenote::get_onenote_token())
+                $this->set_error('Could not download your submission from OneNote. Please try again.');
+            else
+                $this->set_error('Please sign in to OneNote before attempting to save your changes.');
+            
             return false;
+        }
         
         $fs = get_file_storage();
         
@@ -343,14 +349,16 @@ class assign_submission_onenote extends assign_submission_plugin {
         $o = '';
         
         if ($count <= ASSIGNSUBMISSION_ONENOTE_MAXSUMMARYFILES) {
-            if (microsoft_onenote::get_onenote_token()) {                    
-                // show a link to open the OneNote page
-                $o .= microsoft_onenote:: render_action_button('View in OneNote',
-                        $this->assignment->get_course_module()->id, false, $is_teacher,
-                        $submission->userid, $submission->id, null);
-            } else {
-                $o .= microsoft_onenote::get_onenote_signin_widget();
-                $o .= '<br/><br/><p>Click on the button above to sign in to OneNote if you want to view the submission there.</p>';
+            if ($is_teacher || ($submission->status == ASSIGN_SUBMISSION_STATUS_SUBMITTED)) {
+                if (microsoft_onenote::get_onenote_token()) {                    
+                    // show a link to open the OneNote page
+                    $o .= microsoft_onenote:: render_action_button('View submission in OneNote',
+                            $this->assignment->get_course_module()->id, false, $is_teacher,
+                            $submission->userid, $submission->id, null);
+                } else {
+                    $o .= microsoft_onenote::get_onenote_signin_widget();
+                    $o .= '<br/><br/><p>Click on the button above to sign in to OneNote if you want to view the submission there.</p>';
+                }
             }
             
             // show standard link to download zip package
