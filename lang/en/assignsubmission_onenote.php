@@ -22,7 +22,6 @@
  * @copyright  Microsoft Open Technologies, Inc. (based on files by NetSpot {@link http://www.netspot.com.au})
  */
 
-
 $string['configmaxbytes'] = 'Maximum OneNote page size';
 $string['countfiles'] = 'OneNotes: {$a}';
 $string['default'] = 'Enabled by default';
