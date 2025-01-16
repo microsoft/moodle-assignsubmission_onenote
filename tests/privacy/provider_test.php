@@ -42,7 +42,7 @@ require_once($CFG->dirroot . '/mod/assign/tests/privacy/provider_test.php');
  * @copyright  Microsoft, Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider_test extends \mod_assign\privacy\provider_test {
+class provider_test extends \mod_assign\tests\provider_testcase {
     /**
      * Quick test to make sure that get_metadata returns something.
      */
